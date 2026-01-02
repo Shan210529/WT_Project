@@ -1,0 +1,16 @@
+Error: Waiting for element to be located By(xpath, //h1[contains(text(), 'Welcome, Selenium User')])
+Wait timed out after 10041ms
+URL: http://localhost:5173/
+Body: R
+RoomCraft
+Selenium User
+S
+Welcome, Selenium User.
+Ready to transform spaces? Manage your floor plans and bring your interior design ideas to life with RoomCraft.
+Start New Project
+Your Recent Projects
+0 Projects Found
+Create New Room
+Start from a blank canvas
+No designs created yet
+It looks a bit empty here. Start your first project to begin your interior design journey.
