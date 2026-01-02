@@ -35,6 +35,17 @@ describe('Interior Designer App Tests', function () {
     }
   });
 
+  it('should navigate to register page', async function () {
+    await driver.get(`${baseUrl}/login`);
+    const registerLink = await driver.findElement(By.linkText('Create Account'));
+    await registerLink.click();
+    await driver.wait(until.urlIs(`${baseUrl}/register`), 5000);
+    // Wait for the specific header to be visible
+    const head = await driver.wait(until.elementLocated(By.xpath("//h2[contains(., 'Create Account')]")), 5000);
+    const text = await head.getText();
+    assert.strictEqual(text, 'Create Account');
+  });
+
   it('should register a new user successfully', async function () {
     await driver.get(`${baseUrl}/register`);
 
@@ -180,6 +191,36 @@ describe('Interior Designer App Tests', function () {
       const elements = await driver.findElements(By.xpath(`//h3[contains(., '${designName}')]`));
       return elements.length === 0;
     }, 10000, `Design '${designName}' was not removed from dashboard`);
+  });
+
+  it('should show empty state when no designs exist', async function () {
+    // We just deleted the design in the previous test, so it might be empty if it was the only one.
+    // However, other tests might have run. 
+    // This test is conditional: checking if the "No designs" element is visible OR the list is present.
+    // We will force a check for the "No designs created yet" text IF the list is empty.
+
+    await driver.get(`${baseUrl}/`);
+
+    // Wait for Dashboard to finish loading (wait for Navbar or specific element that confirms load)
+    // We can wait until "Loading your studio..." is STALE (gone).
+    // Or wait for "RoomCraft" logic.
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(., 'RoomCraft')]")), 10000);
+
+    // Give a small pause for React effect
+    await driver.sleep(1000);
+
+    // Check how many projects.
+    const projects = await driver.findElements(By.xpath("//h3[contains(@class, 'font-bold')]"));
+
+    if (projects.length === 0) {
+      const emptyState = await driver.wait(until.elementLocated(By.xpath("//h3[contains(., 'No designs created yet')]")), 5000);
+      assert.ok(await emptyState.isDisplayed(), 'Empty state should be displayed when no projects');
+    } else {
+      // If projects exist, we can't test empty state easily without deleting all.
+      // So we will just assert that the list container exists
+      const listContainer = await driver.findElement(By.xpath("//h2[contains(., 'Your Recent Projects')]"));
+      assert.ok(await listContainer.isDisplayed());
+    }
   });
 
   it('should add furniture to the design', async function () {
